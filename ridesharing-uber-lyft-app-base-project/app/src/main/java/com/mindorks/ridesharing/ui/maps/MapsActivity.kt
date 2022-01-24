@@ -1,6 +1,6 @@
 package com.mindorks.ridesharing.ui.maps
 
-import android.annotation.SuppressLint
+//import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
@@ -14,10 +14,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.*
 import com.mindorks.ridesharing.R
 import com.mindorks.ridesharing.data.network.NetworkService
+import com.mindorks.ridesharing.utils.MapUtils
 import com.mindorks.ridesharing.utils.PermissionUtils
 import com.mindorks.ridesharing.utils.ViewUtils
 
@@ -33,6 +33,7 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private lateinit var locationCallback: LocationCallback
     private var currentLatLng: LatLng? = null
+    private val nearbyCabMarkerList= arrayListOf<Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,13 +55,17 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
-    @SuppressLint("MissingPermission")
-    private fun enableMyLocationOnMap(){
-        googleMap.setPadding(0, ViewUtils.dpToPx(48f), 0, 0)
-        googleMap.isMyLocationEnabled=true
+    private fun addCarMarkerAndGet(latLng: LatLng?):Marker{
+        val bitmapDescriptor=BitmapDescriptorFactory.fromBitmap(MapUtils.getCarBitmap(this))
+        return googleMap.addMarker(MarkerOptions().position(latLng!!).flat(true).icon(bitmapDescriptor))
     }
 
-    @SuppressLint("MissingPermission")
+    private fun enableMyLocationOnMap(){
+        googleMap.setPadding(0, ViewUtils.dpToPx(48f), 0, 0)
+        googleMap.isMyLocationEnabled
+    }
+
+
     private fun setUpLocationListener(){
         fusedLocationProviderClient= FusedLocationProviderClient(this)
         //For getting the current location update after every 2 seconds
@@ -86,8 +91,6 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
         }
         fusedLocationProviderClient?.requestLocationUpdates(
             locationRequest,
-            locationCallback,
-            Looper.myLooper()
         )
     }
 
@@ -150,6 +153,7 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
     }
 
     override fun showNearByCabs(latlngList: List<LatLng>) {
-
+        nearbyCabMarkerList.clear()
+        val nearbyCabMarker=addCarMarkerAndGet(latLng)
     }
 }
