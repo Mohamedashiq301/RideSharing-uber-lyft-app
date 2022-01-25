@@ -57,12 +57,12 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
 
     private fun addCarMarkerAndGet(latLng: LatLng?):Marker{
         val bitmapDescriptor=BitmapDescriptorFactory.fromBitmap(MapUtils.getCarBitmap(this))
-        return googleMap.addMarker(MarkerOptions().position(latLng!!).flat(true).icon(bitmapDescriptor))
+        return googleMap.addMarker(MarkerOptions().position(latLng).flat(true).icon(bitmapDescriptor))
     }
 
     private fun enableMyLocationOnMap(){
         googleMap.setPadding(0, ViewUtils.dpToPx(48f), 0, 0)
-        googleMap.isMyLocationEnabled
+        googleMap.isMyLocationEnabled=true
     }
 
 
@@ -91,6 +91,8 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
         }
         fusedLocationProviderClient?.requestLocationUpdates(
             locationRequest,
+            locationCallback,
+            Looper.myLooper()
         )
     }
 
@@ -154,6 +156,6 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
 
     override fun showNearByCabs(latlngList: List<LatLng>) {
         nearbyCabMarkerList.clear()
-        val nearbyCabMarker=addCarMarkerAndGet(latLng)
+        val nearbyCabMarker=addCarMarkerAndGet()
     }
 }
