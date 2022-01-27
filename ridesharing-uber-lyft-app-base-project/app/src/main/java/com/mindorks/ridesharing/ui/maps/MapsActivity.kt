@@ -1,11 +1,14 @@
 package com.mindorks.ridesharing.ui.maps
 
 //import android.annotation.SuppressLint
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -55,11 +58,12 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
-    private fun addCarMarkerAndGet(latLng: LatLng?):Marker{
+    private fun addCarMarkerAndGet(latLng: LatLng):Marker{
         val bitmapDescriptor=BitmapDescriptorFactory.fromBitmap(MapUtils.getCarBitmap(this))
         return googleMap.addMarker(MarkerOptions().position(latLng).flat(true).icon(bitmapDescriptor))
     }
 
+    @SuppressLint("MissingPermission")
     private fun enableMyLocationOnMap(){
         googleMap.setPadding(0, ViewUtils.dpToPx(48f), 0, 0)
         googleMap.isMyLocationEnabled=true
@@ -88,6 +92,23 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
                 }
                 //for example:update the  location of the user on server
             }
+        }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
         }
         fusedLocationProviderClient?.requestLocationUpdates(
             locationRequest,
@@ -155,7 +176,7 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
     }
 
     override fun showNearByCabs(latlngList: List<LatLng>) {
-        nearbyCabMarkerList.clear()
-        val nearbyCabMarker=addCarMarkerAndGet()
+        //nearbyCabMarkerList.clear()
+        //val nearbyCabMarker=addCarMarkerAndGet()
     }
 }
