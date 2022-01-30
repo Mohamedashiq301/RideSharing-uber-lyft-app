@@ -36,7 +36,7 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private lateinit var locationCallback: LocationCallback
     private var currentLatLng: LatLng? = null
-    private val nearbyCabMarkerList= arrayListOf<Marker>()
+    private val nearbyCabMarkerList = arrayListOf<Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,40 +49,42 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
         presenter.onAttach(this)
     }
 
-    private fun moveCamera(latLng: LatLng?){
+    private fun moveCamera(latLng: LatLng?) {
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
     }
 
-    private fun animateCamera(latLng: LatLng?){
-        val cameraPosition=CameraPosition.Builder().target(latLng).zoom(15.5f).build()
+    private fun animateCamera(latLng: LatLng?) {
+        val cameraPosition = CameraPosition.Builder().target(latLng).zoom(15.5f).build()
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
-    private fun addCarMarkerAndGet(latLng: LatLng):Marker{
-        val bitmapDescriptor=BitmapDescriptorFactory.fromBitmap(MapUtils.getCarBitmap(this))
-        return googleMap.addMarker(MarkerOptions().position(latLng).flat(true).icon(bitmapDescriptor))
+    private fun addCarMarkerAndGet(latLng: LatLng): Marker {
+        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(MapUtils.getCarBitmap(this))
+        return googleMap.addMarker(
+            MarkerOptions().position(latLng).flat(true).icon(bitmapDescriptor)
+        )
     }
 
     @SuppressLint("MissingPermission")
-    private fun enableMyLocationOnMap(){
+    private fun enableMyLocationOnMap() {
         googleMap.setPadding(0, ViewUtils.dpToPx(48f), 0, 0)
-        googleMap.isMyLocationEnabled=true
+        googleMap.isMyLocationEnabled = true
     }
 
 
-    private fun setUpLocationListener(){
-        fusedLocationProviderClient= FusedLocationProviderClient(this)
+    private fun setUpLocationListener() {
+        fusedLocationProviderClient = FusedLocationProviderClient(this)
         //For getting the current location update after every 2 seconds
-        val locationRequest=LocationRequest().setInterval(2000).setFastestInterval(2000)
+        val locationRequest = LocationRequest().setInterval(2000).setFastestInterval(2000)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
 
-        locationCallback=object :LocationCallback(){
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
-                if (currentLatLng==null){
-                    for (location in locationResult.locations){
-                        if (currentLatLng==null){
-                            currentLatLng= LatLng(location.latitude,location.longitude)
+                if (currentLatLng == null) {
+                    for (location in locationResult.locations) {
+                        if (currentLatLng == null) {
+                            currentLatLng = LatLng(location.latitude, location.longitude)
                             enableMyLocationOnMap()
                             moveCamera(currentLatLng)
                             animateCamera(currentLatLng)
@@ -118,7 +120,7 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap= googleMap
+        this.googleMap = googleMap
     }
 
     override fun onStart() {
@@ -176,7 +178,10 @@ class MapsActivity : AppCompatActivity(), MapsView, OnMapReadyCallback {
     }
 
     override fun showNearByCabs(latlngList: List<LatLng>) {
-        //nearbyCabMarkerList.clear()
-        //val nearbyCabMarker=addCarMarkerAndGet()
+        nearbyCabMarkerList.clear()
+        for (latLng in latlngList) {
+            val nearbyCabMarker = addCarMarkerAndGet(latLng)
+            nearbyCabMarkerList.add(nearbyCabMarker)
+        }
     }
 }
